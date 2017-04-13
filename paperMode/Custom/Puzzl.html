@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>SNEK</title>
+	<style type = "text/css">
+		canvas {
+			width: 1024px;
+			height: 720px;
+		}
+	</style>
+    <script type="text/javascript" src="../dist/paper-full.js"></script>
+    <script type="text/paperscript" canvas="canvas">
+		var scaler = 100
+		var puz = new Path() //The puzzle edge
+		puz.strokeColor = 'black'
+		puz.add(new Point(scaler,scaler), new Point(scaler+(Math.random()*scaler/4 - scaler/8),1.5*scaler+(Math.random()*scaler/4 - scaler / 8)), new Point(scaler,2*scaler))
+		for (var i = 0; i < puz.segments.length; i++){
+			puz.segments[i].handleOut = new Point((Math.random()*scaler/2)-(scaler/4), scaler/4)
+			puz.segments[i].handleIn = new Point((Math.random()*scaler/2)-(scaler/4), -scaler/4)
+		}
+		var puz2 = new Path() //The second puzzle edge
+		puz2.strokeColor = 'black'
+		puz2.add(new Point(scaler,scaler), new Point(1.5*scaler+(Math.random()*scaler/4 - scaler/8),scaler+(Math.random()*scaler/4 - scaler / 8)), new Point(2*scaler,scaler))
+		for (var i = 0; i < puz2.segments.length; i++){
+			puz2.segments[i].handleOut = new Point(scaler/4, (Math.random()*scaler/2)-(scaler/4))
+			puz2.segments[i].handleIn = new Point(-scaler/4, (Math.random()*scaler/2)-(scaler/4))
+		}
+		
+		
+		var pizzy = new Raster({
+			source: 'JPizzle.jpg',
+			position: view.center
+		});
+		pizzy.scale(0.5)
+		circ1 = Path.Circle(new Point(480,300), 50)
+		circ1.strokeColor = 'black'
+		circ1.fillColor = 'blue'
+		circ2 = Path.Circle(new Point(480,300), 50)
+		circ2.strokeColor = 'black'
+		circ2.strokeWidth = 10
+		groupy = new Group([circ1, pizzy, circ2])
+		groupy.clipped = true
+		groupy.onMouseDrag = function(event){
+			groupy.position += event.delta
+		}
+		
+		
+    </script>
+</head>
+<body>
+    <canvas id="canvas" resize></canvas>
+</body>
+</html>
