@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>SNEK</title>
+    <title>Puzzle time!</title>
 	<style type = "text/css">
 		canvas {
 			width: 1024px;
@@ -11,6 +11,8 @@
 	</style>
     <script type="text/javascript" src="../dist/paper-full.js"></script>
     <script type="text/paperscript" canvas="canvas">
+		
+		/*
 		var scaler = 100
 		var puz = new Path() //The puzzle edge
 		puz.strokeColor = 'black'
@@ -44,6 +46,122 @@
 		groupy.onMouseDrag = function(event){
 			groupy.position += event.delta
 		}
+		 */ //group and puzzle geometry testing. Now for creating an actual grid!
+		
+		
+		var xPieces = 5
+		var yPieces = 5
+		var xscaler 
+		var yscaler
+		var puzzlePieces = [[]]
+		var ras
+		
+		function puzzleBuilder(xscalerFunc, yscalerFunc, xPiecesFunc, yPiecesFunc){
+			var upperLeftCorner = new Point(view.center.x - (ras.width / 2), view.center.y - (ras.height / 2)) //The raster appears in center stage. So we need the puzzle pieces to adapt to that.
+			for(var i = 0; i < puzzlePieces.length; i++){
+				//if(puzzlePieces[i] === Array){  //on second thought, maybe we don't need this.
+				for(var j = 0; j < puzzlePieces[i].length; j++){
+					puzzlePieces[i][j].remove() //Clearing out all existing objects inside it, just in case.
+				}
+				//}
+			}
+			puzzlePieces = []
+			for(var i = 0; i < xPiecesFunc; i++){
+				var tempArray = []
+				for(var j = 0; j < yPiecesFunc; j++){
+					var pieceMask = new Path.Rectangle(new Point(upperLeftCorner.x + (i * xscalerFunc), upperLeftCorner.y + (j * yscalerFunc)), new Point(upperLeftCorner.x + ((i + 1) * xscalerFunc), upperLeftCorner.y + ((j + 1)* yscalerFunc))) //Gonna add in more complicated geometry later.
+					var pieceOutline = pieceMask.clone() //That SHOULD work?
+					var pieceFill = ras.clone() //Each piece will have its own copy of the main picture, and damn the inefficiency.
+					pieceMask.fillColor = new Color(1,1,1) //Fill the 'shape' so that it'll overlap properly, i hope.
+					pieceOutline.strokeColor = 'black'
+					pieceOutline.strokeWidth = 5 //And make a nice thick outline for the pieces.
+					
+					var pieceGroup = new Group([pieceMask, pieceFill, pieceOutline])
+					pieceGroup.clipped = true
+					
+					tempArray.push(pieceGroup)
+				}
+				puzzlePieces.push(tempArray)
+			}
+			/*for(var i = 0; i < xPiecesFunc; i++){ //Well, THIS doesn't work.
+				for(var j = 0; j < yPiecesFunc; j++){
+					puzzlePieces[i][j].onMouseDrag = function(event){
+						puzzlePieces[i][j].position += event.delta
+					}
+				}
+			}*/
+		}
+		
+		ras = new Raster({
+			source: 'JPizzle.jpg',
+			position: view.center
+		});
+		ras.onLoad = function(){
+			xscaler = ras.width / xPieces
+			yscaler = ras.height / yPieces
+			console.log('puzzle piece width: ' + xscaler + ' puzzle piece height: ' + yscaler)
+			puzzleBuilder(xscaler, yscaler, xPieces, yPieces)
+			ras.visible = false
+		}
+		
+		
+		//Mouse behaviors...
+		stage = document.getElementById("canvas")
+		
+		/*function clickBehavior(mevent){
+			//console.log(mevent.clientX)
+			for(var i = 0; i < puzzlePieces.length; i++){
+				for(var j = 0; j < puzzlePieces[i].length; j++){
+					if(puzzlePieces[i][j].firstChild.contains(new Point(mevent.clientX, mevent.clientY))){
+						
+					}
+				}
+			}
+		}
+		stage.addEventListener("mousedown",clickBehavior) */
+		
+		var movingPiece = new Item() //gotta have this on hand to modify
+		var mouseDownLoc = new Point(0,0) //default values, YEAH
+		var pieceCoords = new Point(0,0)
+		var pieceStartLoc = new Point(0,0)
+		var isDragging = false //boolean to keep a crap ton of error messages from appearing.
+		function downBehavior(mevent){
+			//console.log(mevent.clientX)
+			for(var i = 0; i < puzzlePieces.length; i++){ //navigate through the puzzle piece array...
+				for(var j = 0; j < puzzlePieces[i].length; j++){
+					if(puzzlePieces[i][j].firstChild.contains(new Point(mevent.clientX, mevent.clientY))){ //This will only trigger when the outline of the puzzle piece contains the point.
+						movingPiece = puzzlePieces[i][j] //SAVED for future abuse.
+						pieceStartLoc = movingPiece.position //Remember where we started...
+						mouseDownLoc = new Point(mevent.clientX, mevent.clientY) //and where the mouse was originally.
+						pieceCoords = new Point(i, j) //This doesn't actually need to be a point, but i didn't feel like using a tuple.
+						j = puzzlePieces[i].length //now ABORT!
+						i = puzzlePieces.length - 1
+						isDragging = true //Drag mode: ON!
+					}
+				}
+			}
+		}
+		stage.addEventListener("mousedown",downBehavior) //important to add the listeners to the stage.
+		
+		function moveBehavior(mevent){
+			if(isDragging){ //Don't do nothing unless you're in drag mode!
+				movingPiece.position = pieceStartLoc + (new Point(mevent.clientX, mevent.clientY) - mouseDownLoc) //MATH for moving!
+				puzzlePieces[pieceCoords.x][pieceCoords.y] = movingPiece //And throw that back in there just in case that's how it works. I honestly have no idea but better safe than sorry.
+			}
+		}
+		stage.addEventListener("mousemove",moveBehavior)
+		function upBehavior(mevent){
+			if(isDragging){
+				moveBehavior(mevent) //May as well offload that functionality.
+				movingPiece = new Item() //RESET so we don't screw with the wrong piece!
+				mouseDownLoc = new Point(0,0)
+				pieceCoords = new Point(0,0)
+				pieceStartLoc = new Point(0,0)
+				isDragging = false //Drag mode: OFF!
+			}
+		}
+		stage.addEventListener("mouseup",upBehavior)
+		
 		
 		
     </script>
