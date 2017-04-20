@@ -1,6 +1,4 @@
-
-
-function fillPuz(rows,columns,width,height){
+/*function fillPuz(rows,columns,width,height){
     var gid = 0;
     var puzzle = [];
     for(var i = 0; i < rows; i++){
@@ -11,11 +9,10 @@ function fillPuz(rows,columns,width,height){
         }
     }
     return puzzle;
+}*/
 
-}
-
-function makePiece(inx,iny,inwidth,inheight, ingroupid){
-    var piece = {x: inx, y: iny, width: inwidth, height: inheight, groupid: ingroupid};
+function makePiece(ingroup, inpicPoint,ingroupid, inipos, injpos){
+    var piece = {groups: [ingroup], picPoint: inpicPoint, groupid: ingroupid, ipos: [inipos], jpos: [injpos]};
     return piece;
 }
 
@@ -24,28 +21,3 @@ function getRelPos(piece){
     py = piece.y * piece.height;
     return [px,py];
 }
-
-function chooseRowLength(){
-
-}
-
-function chooseColumnLength(){
-
-}
-
-function chooseWidth(){
-
-}
-
-function chooseHeight(){
-
-}
-
-function choosePresets(){
-
-}
-
-function uploadPhoto(){
-
-}
-
