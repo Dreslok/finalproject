@@ -36,17 +36,17 @@
 </head>
 <body>
 
-	<form name="myForm" action="Puzzl.html" onsubmit="return puzSetup()" method="post">
+	<form name="myForm" action="storetest.html" onsubmit="return puzSetup()" method="post">
 		<table>
 			<tr>
 				<td>Pick a pic!
-					<input type="file" onchange="addNewPic()">
+					<input type="file" id="puzzlimg" onchange="addNewPic()">
 					<img src="" height="200" alt="Image preview...">
 				</td>
 				<td>
 					<input type="radio" name="ptype" value="ps">Choose a preset size!
 					<input type="radio" name="ptype" value="cs">Make your own dimensions!
-					<input type="button" onclick="chooseTypeValues()">
+					<input type="button" onclick="chooseTypeValues()" value="CLICK!">
 				</td>
 			</tr>
 			<tr id="pset">

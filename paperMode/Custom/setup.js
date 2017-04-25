@@ -7,13 +7,10 @@ function puzSetup(){
         alert("try again");
         return false;
     }
-    if(isPreset()){
-        sendPresetVals();
-    }
-    if(isCustom()){
-        sendCustomVals();
-    }
+    storeshit();
+    return true;
 }
+
 
 function sendPresetVals(){
     var pv1 = myForm.presets.value;
@@ -198,4 +195,35 @@ function addNewPic(){
        } else {
            preview.src = "";
        }
+}
+function storeShit(){
+    if(isPreset()){
+        var pie = sendPresetVals();
+    }
+    else if(isCustom()){
+        var pie = sendCustomVals();
+    }
+    else{
+        var pie = {rows: 5, columns: 5, width: 500, height: 500}
+    }
+    localStorage.setItem("rows", pie.rows);
+    localStorage.setItem("columns", pie.columns);
+    localStorage.setItem("width", pie.width);
+    localStorage.setItem("height", pie.height);
+    puzzleImage = document.getElementById('puzzlimg');
+    imgData = getBase64Image(puzzleImage);
+    localStorage.setItem("imgData", imgData);
+}
+
+function getBase64Image(img) {
+    var canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+
+    var ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0);
+
+    var dataURL = canvas.toDataURL("image/png");
+
+    return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
 }
