@@ -64,11 +64,22 @@
 			}
 			puzzlePieces = []
 			var gid = 0
+			var prevHorizLine = new Path() //We need a variable to hold the previously generated horizontal line, and one for the previously generated vertical line, so that pieces mesh.
+			var prevVertLineArray = [] //Why is this one an array? Because we create columns, so we need to remember the previous geometry of the entire previous column when we generate the next one.
+			for(var i = 0; i < yPiecesFunc; i++){ //and now we gotta fill that array.
+				var tempVert = new Path()
+				tempVert.add(new Point(upperLeftCorner.x, upperLeftCorner.y + (yscalerFunc * i)), new Point(upperLeftCorner.x, upperLeftCorner.y + (xscalerFunc * (i + 1)))) 
+				prevVertLineArray.push(tempVert)
+			}
+			
 			for(var i = 0; i < xPiecesFunc; i++){
+				prevHorizLine.remove()
+				prevHorizLine = new Path() //get your old geometry outta here
+				prevHorizLine.add(new Point(upperLeftCorner.x + (xscalerFunc * i), upperLeftCorner.y), new Point(upperLeftCorner.x + (xscalerFunc * (i + 1)), upperLeftCorner.y)) //Reset to straight
 				for(var j = 0; j < yPiecesFunc; j++){
 					var pieceMask = new Path.Rectangle(new Point(upperLeftCorner.x + (i * xscalerFunc), upperLeftCorner.y + (j * yscalerFunc)), new Point(upperLeftCorner.x + ((i + 1) * xscalerFunc), upperLeftCorner.y + ((j + 1)* yscalerFunc))) //Gonna add in more complicated geometry later.
 					var pieceOutline = pieceMask.clone() //That SHOULD work?
-					var pieceFill = ras.clone() //Each piece will have its own copy of the main picture, and damn the inefficiency.
+					var pieceFill = ras.clone() //Each piece will have its owncopy of the main picture, and damn the inefficiency.
 					pieceMask.fillColor = new Color(1,1,1) //Fill the 'shape' so that it'll overlap properly, i hope.
 					pieceOutline.strokeColor = 'black'
 					pieceOutline.strokeWidth = 5 //And make a nice thick outline for the pieces.
@@ -82,13 +93,7 @@
 					puzzlePieces.push(puzpiece)
 				}
 			}
-			/*for(var i = 0; i < xPiecesFunc; i++){ //Well, THIS doesn't work.
-				for(var j = 0; j < yPiecesFunc; j++){
-					puzzlePieces[i][j].onMouseDrag = function(event){
-						puzzlePieces[i][j].position += event.delta
-					}
-				}
-			}*/
+			
 		}
 		
 		ras = new Raster({
@@ -192,6 +197,7 @@
 									if(Math.abs(piece1.jpos[i1] - piece2.jpos[i2]) == 1){
 										console.log("SNAP triggered at " + i + ", " + j + "!")
 										snap(puzarray, piece1, piece2)
+										//break breaktastic // this enforces a One Snap Per Mouseclick logic. We'll see how well that does.
 									}
 								}
 								if(Math.abs(piece1.ipos[i1] - piece2.ipos[i2]) == 1){
@@ -200,6 +206,7 @@
 									if(piece1.jpos[i1] == piece2.jpos[i2]){
 										console.log("SNAP triggered at " + i + ", " + j + "!")
 										snap(puzarray, piece1, piece2)
+										//break breaktastic
 									}
 								}
 							}
@@ -213,7 +220,8 @@
 			var targ
 			if(puz1.gid < puz2.gid){
 				moveAll(puz1, (puz2.picPoint - puz1.picPoint))	
-				for(var i = 0; i < puz2.groups.length; i++){
+				var numPops = puz2.groups.length //gotta save this or else the Popping decreases the length of the array and we get pieces left abandoned by their groups.
+				for(var i = 0; i < numPops; i++){
 					puz1.groups.push(puz2.groups.pop())
 					puz1.ipos.push(puz2.ipos.pop())
 					puz1.jpos.push(puz2.jpos.pop())
@@ -221,7 +229,8 @@
 				targ = puzarray.indexOf(puz2)
 			}else{
 				moveAll(puz2, (puz1.picPoint - puz2.picPoint))
-				for(var i = 0; i < puz1.groups.length; i++){
+				var numPops = puz1.groups.length
+				for(var i = 0; i < numPops; i++){
 					puz2.groups.push(puz1.groups.pop())
 					puz2.ipos.push(puz1.ipos.pop())
 					puz2.jpos.push(puz1.jpos.pop())
