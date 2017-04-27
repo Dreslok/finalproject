@@ -7,7 +7,6 @@
 		#canvas {
 			width: 1024px;
 			height: 720px;
-			visibility: collapse;
 		}
 		td {
 			border-width: 1px;
@@ -262,13 +261,13 @@
 		<table>
 			<tr>
 				<td>Pick a pic!
-					<input type="file" id="puzzlimg" onchange="addNewPic()">
+					<input type="file" id="puzzlimg" onchange="addNewPic(); updateSettings()">
 					<img src="" height="200" alt="Image preview...">
 				</td>
 				<td>
 					<input type="radio" name="ptype" value="ps">Choose a preset size!
 					<input type="radio" name="ptype" value="cs">Make your own dimensions!
-					<input type="button" onclick="chooseTypeValues()" value="CLICK!">
+					<input type="button" onclick="chooseTypeValues(); updateSettings()" value="CLICK!">
 				</td>
 			</tr>
 			<tr id="pset">
@@ -309,18 +308,21 @@
 				</td>
 			</tr>
 			<tr id="cstm">
-				<td>
-    				<input type="number" name="rows" id="rows" min="1" max="50"></input>
+				<td>Number of rows: 
+    				<input type="number" name="rows" id="rows" min="1" max="50" onchange="updateSettings()"></input>
 				</td>
-				<td>
-    				<input type="number" name="columns" id="columns" min="1" max="50"></input>
+				<td>Number of columns: 
+    				<input type="number" name="columns" id="columns" min="1" max="50" onchange="updateSettings()"></input>
 				</td>
-				<td>
-    				<input type="number" name="width" id="width" min="50" max="2000"></input>
+				<td>Puzzle width: 
+    				<input type="number" name="width" id="width" min="50" max="2000" onchange="updateSettings()"></input>
 				</td>
-				<td>
-					<input type="number" name="height" id="height" min="50" max="2000"></input>
+				<td>Puzzle height: 
+					<input type="number" name="height" id="height" min="50" max="2000" onchange="updateSettings()"></input>
 				</td>
+			</tr>
+			<tr>
+				<td id="viewVars"></td>
 			</tr>
 		</table>
 	</form>

@@ -1,20 +1,37 @@
 
 function updateSettings(){
-    var thepuzimg;
+    var thepuzimg = Image;
+    var rows;
+    var columns;
+    var width;
+    var height;
     if (isPreset()){
         thepuzimg.src = document.querySelector('input[type=file]').files[0];
         var RsandCs = sendPresetVals();
-        var imgsize = scalePic(thepuzimg.width, thepuzimg.height, myForm.presetimgsize.value);
+        rows = RsandCs.rows;
+        columns = RsandCs.columns;
+        var imgsize = myForm.presetimgsize.value;
+        width = imgsize;
+        height = imgsize;
     }
     else if (isCustom()){
         thepuzimg.src = document.querySelector('input[type=file]').files[0];
         var frack = sendCustomVals();
+        rows = frack.rows;
+        columns = frack.columns;
+        width = frack.width;
+        height = frack.height;
+
     }
     else{
         thepuzimg.src = JPizzle.jpg;
         rows = 5;
         columns = 5;
+        width = 420;
+        height = 666;
     }
+    document.getElementById("viewVars").innerHTML = "" + rows + "   " + columns + "    " + width + "   " + height + "";
+
 }
 
 
@@ -76,20 +93,6 @@ function sendPresetVals(){
     
     return {rows: r, columns: c};
 
-}
-
-function scalePic(width, height, lsize){
-    var w;
-    var h;
-    if (width >= height){
-        w = lsize;
-        h = lsize*(height/width);
-    }
-    else{
-        w = lsize*(width/height);
-        h = lsize;
-    }
-    return {width: w, height: h};
 }
 
 function sendCustomVals(){
@@ -155,24 +158,4 @@ function addNewPic(){
        } else {
            preview.src = "";
        }
-}
-function storeShit(){
-    var pie;
-    if(isPreset()){
-        pie = sendPresetVals();
-    }
-    else if(isCustom()){
-        pie = sendCustomVals();
-    }
-    else{
-        pie = {rows: 5, columns: 5, width: 500, height: 500}
-    }
-    console.log(pie);
-    localStorage.setItem("rows", pie.rows);
-    localStorage.setItem("columns", pie.columns);
-    localStorage.setItem("width", pie.width);
-    localStorage.setItem("height", pie.height);
-    puzzleImage = document.getElementById('puzzlimg');
-    imgData = getBase64Image(puzzleImage);
-    localStorage.setItem("imgData", imgData);
 }
