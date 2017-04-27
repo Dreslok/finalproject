@@ -1,19 +1,22 @@
-function puzSetup(){
-    if(!isValidCustom()){
-        alert("try again");
-        return false;
+
+function updateSettings(){
+    var thepuzimg;
+    if (isPreset()){
+        thepuzimg.src = document.querySelector('input[type=file]').files[0];
+        var RsandCs = sendPresetVals();
+        var imgsize = scalePic(thepuzimg.width, thepuzimg.height, myForm.presetimgsize.value);
     }
-    if(!isValidPreset()){
-        alert("try again");
-        return false;
+    else if (isCustom()){
+        thepuzimg.src = document.querySelector('input[type=file]').files[0];
+        var frack = sendCustomVals();
     }
-    if(isPreset()){
-        sendPresetVals();
-    }
-    if(isCustom()){
-        sendCustomVals();
+    else{
+        thepuzimg.src = JPizzle.jpg;
+        rows = 5;
+        columns = 5;
     }
 }
+
 
 function sendPresetVals(){
     var pv1 = myForm.presets.value;
@@ -70,24 +73,31 @@ function sendPresetVals(){
         r = 20;
         c = 20;
     }
-    if(pv2 == "orgsz"){
-        w = 4;
-        h = 5;
-    }
-    if(pv2 != "orgsz"){
-        w = pv2;
-        h = pv2;
-    }
-    var pie = {rows: r, columns: c, width: w, height: h};
-    return pie;
+    
+    return {rows: r, columns: c};
+
 }
+
+function scalePic(width, height, lsize){
+    var w;
+    var h;
+    if (width >= height){
+        w = lsize;
+        h = lsize*(height/width);
+    }
+    else{
+        w = lsize*(width/height);
+        h = lsize;
+    }
+    return {width: w, height: h};
+}
+
 function sendCustomVals(){
     var r = myForm.rows.value;
     var c = myForm.columns.value;
     var w = myForm.width.value;
     var h = myForm.height.value;
-    var pie = {rows: r, columns: c, width: w, height: h};
-    return pie;
+    return {rows: r, columns: c, width: w, height: h};
 }
 
 function typeSelected(){
@@ -129,60 +139,7 @@ function chooseCustom(){
     document.getElementById("pset").style.visibility = "collapse";
 }
 
-function isValidRxC(){
-    if (myForm.presets.value){
-        return true;
-    }
-    return false;
-}
-function isValidImgSize(){
-    if (myForm.presetimgsize.value){
-        return true;
-    }
-    return false;
-}
-function isValidCustom(){
-    if (isPreset()){
-        return true;
-    }
-    else if (isCustom() && isValidRow() && isValidColumn() && isValidWidth() && isValidHeight()){
-        return true;
-    }
-    return false;
-}
-function isValidPreset(){
-    if(isCustom()){
-        return true;
-    }
-    else if(isPreset() && isValidRxC() && isValidImgSize()){
-        return true;
-    }
-    return false;
-}
-function isValidRow(){
-    if (myform.rows.value){
-        return true;
-    }
-    return false;
-}
-function isValidColumn(){
-    if (myform.columns.value){
-        return true;
-    }
-    return false;
-}
-function isValidWidth(){
-    if (myform.width.value){
-        return true;
-    }
-    return false;
-}
-function isValidHeight(){
-    if (myform.height.value){
-        return true;
-    }
-    return false;
-}
+
 
 function addNewPic(){
     var preview = document.querySelector('img'); //selects the query named img
@@ -198,4 +155,24 @@ function addNewPic(){
        } else {
            preview.src = "";
        }
+}
+function storeShit(){
+    var pie;
+    if(isPreset()){
+        pie = sendPresetVals();
+    }
+    else if(isCustom()){
+        pie = sendCustomVals();
+    }
+    else{
+        pie = {rows: 5, columns: 5, width: 500, height: 500}
+    }
+    console.log(pie);
+    localStorage.setItem("rows", pie.rows);
+    localStorage.setItem("columns", pie.columns);
+    localStorage.setItem("width", pie.width);
+    localStorage.setItem("height", pie.height);
+    puzzleImage = document.getElementById('puzzlimg');
+    imgData = getBase64Image(puzzleImage);
+    localStorage.setItem("imgData", imgData);
 }
