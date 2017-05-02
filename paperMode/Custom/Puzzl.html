@@ -4,30 +4,52 @@
     <meta charset="UTF-8">
     <title>Puzzle time!</title>
 	<style type = "text/css">
-		canvas {
+		#canvas {
 			width: 1024px;
 			height: 720px;
+		}
+		td {
+			border-width: 1px;
+			border-color: black;
+			border-style: solid;
+		}
+		tr {
+			border-width: 1px;
+			border-color: black;
+			border-style: solid;
+		}
+		table {
+			border-width: 1px;
+			border-color: darkslateblue;
+			border-style: solid;
+		}
+		#pset {
+			visibility: collapse;
+		}
+		#cstm {
+			visibility: collapse;
 		}
 	</style>
     <script type="text/javascript" src="../dist/paper-full.js"></script>
 	<script type="text/javascript" src="piececlass.js"></script>
+	<script type="text/javascript" src="setup.js"></script>	
     <script type="text/paperscript" canvas="canvas">
 		
 		/*
-		var xscalerFunc = 100
+		var scaler = 100
 		var puz = new Path() //The puzzle edge
 		puz.strokeColor = 'black'
-		puz.add(new Point(xscalerFunc,xscalerFunc), new Point(xscalerFunc+(Math.random()*xscalerFunc/4 - xscalerFunc/8),1.5*xscalerFunc+(Math.random()*xscalerFunc/4 - xscalerFunc / 8)), new Point(xscalerFunc,2*xscalerFunc))
+		puz.add(new Point(scaler,scaler), new Point(scaler+(Math.random()*scaler/4 - scaler/8),1.5*scaler+(Math.random()*scaler/4 - scaler / 8)), new Point(scaler,2*scaler))
 		for (var i = 0; i < puz.segments.length; i++){
-			puz.segments[i].handleOut = new Point((Math.random()*xscalerFunc/2)-(xscalerFunc/4), xscalerFunc/4)
-			puz.segments[i].handleIn = new Point((Math.random()*xscalerFunc/2)-(xscalerFunc/4), -xscalerFunc/4)
+			puz.segments[i].handleOut = new Point((Math.random()*scaler/2)-(scaler/4), scaler/4)
+			puz.segments[i].handleIn = new Point((Math.random()*scaler/2)-(scaler/4), -scaler/4)
 		}
-		var newHorizLine = new Path() //The second puzzle edge
-		newHorizLine.strokeColor = 'black'
-		newHorizLine.add(new Point(xscalerFunc,xscalerFunc), new Point(1.5*xscalerFunc+(Math.random()*xscalerFunc/4 - xscalerFunc/8),xscalerFunc+(Math.random()*xscalerFunc/4 - xscalerFunc / 8)), new Point(2*xscalerFunc,xscalerFunc))
-		for (var i = 0; i < newHorizLine.segments.length; i++){
-			newHorizLine.segments[i].handleOut = new Point(xscalerFunc/4, (Math.random()*xscalerFunc/2)-(xscalerFunc/4))
-			newHorizLine.segments[i].handleIn = new Point(-xscalerFunc/4, (Math.random()*xscalerFunc/2)-(xscalerFunc/4))
+		var puz2 = new Path() //The second puzzle edge
+		puz2.strokeColor = 'black'
+		puz2.add(new Point(scaler,scaler), new Point(1.5*scaler+(Math.random()*scaler/4 - scaler/8),scaler+(Math.random()*scaler/4 - scaler / 8)), new Point(2*scaler,scaler))
+		for (var i = 0; i < puz2.segments.length; i++){
+			puz2.segments[i].handleOut = new Point(scaler/4, (Math.random()*scaler/2)-(scaler/4))
+			puz2.segments[i].handleIn = new Point(-scaler/4, (Math.random()*scaler/2)-(scaler/4))
 		}
 		
 		
@@ -51,7 +73,7 @@
 		
 		
 		var xPieces = 5
-		var yPieces = 3
+		var yPieces = 5
 		var xscaler 
 		var yscaler
 		var puzzlePieces = []
@@ -64,71 +86,11 @@
 			}
 			puzzlePieces = []
 			var gid = 0
-			var prevHorizLine = new Path() //We need a variable to hold the previously generated horizontal line, and one for the previously generated vertical line, so that pieces mesh.
-			var prevVertLineArray = [] //Why is this one an array? Because we create columns, so we need to remember the previous geometry of the entire previous column when we generate the next one.
-			for(var i = 0; i < yPiecesFunc; i++){ //and now we gotta fill that array.
-				var tempVert = new Path()
-				tempVert.add(new Point(upperLeftCorner.x, upperLeftCorner.y + (yscalerFunc * i)), new Point(upperLeftCorner.x, upperLeftCorner.y + (xscalerFunc * (i + 1)))) 
-				prevVertLineArray.push(tempVert)
-			}
-			
 			for(var i = 0; i < xPiecesFunc; i++){
-				prevHorizLine.remove()
-				prevHorizLine = new Path() //get your old geometry outta here
-				prevHorizLine.add(new Point(upperLeftCorner.x + (xscalerFunc * i), upperLeftCorner.y), new Point(upperLeftCorner.x + (xscalerFunc * (i + 1)), upperLeftCorner.y)) //Reset to straight
 				for(var j = 0; j < yPiecesFunc; j++){
-					
-					//var pieceMask = new Path.Rectangle(new Point(upperLeftCorner.x + (i * xscalerFunc), upperLeftCorner.y + (j * yscalerFunc)), new Point(upperLeftCorner.x + ((i + 1) * xscalerFunc), upperLeftCorner.y + ((j + 1)* yscalerFunc))) //Gonna add in more complicated geometry later.
-					//Okay, so instead of just creating a rectangle, we're going to nab a series of four 'edge' Paths and stitch them together.
-					//We've already got PrevHorizLine. And if everything goes well we should have PrevVertLineArray to work with.
-					//That's two. We need two more.
-					//If we're at the edge of the piece ( j = yPiecesFunc - 1 or i = xPiecesFunc - 1), then we just use a straight line.
-					//Otherwise, we generate a new line segment based on the edge coordinates of the piece and the scaling factor in each direction.
-					//Which we convert into a Path, in the form of var pieceMask.
-					//The generated horizontal and vertical lines are then saved in prevHorizLine and prevVertLineArray.
-					
-					var newVertLine = new Path() //The vertical puzzle edge...
-					newVertLine.strokeColor = 'black' //This is if you want to see the generated edges seperately for some reason.
-					if(i < xPiecesFunc - 1){ //Chech to see if we're at the right side of the puzzle.
-						var vp1 = new Point((upperLeftCorner.x + xscalerFunc * (i+1)), (upperLeftCorner.y + yscalerFunc * (j)))
-						var vp2 = new Point((upperLeftCorner.x + xscalerFunc * (i+1)) + (Math.random()*xscalerFunc/4 - xscalerFunc/8), (upperLeftCorner.y + yscalerFunc * (j + 0.5))+(Math.random()*yscalerFunc/4 - yscalerFunc / 8))
-						var vp3 = new Point((upperLeftCorner.x + xscalerFunc * (i+1)), (upperLeftCorner.y + yscalerFunc * (j+1)))
-						newVertLine.add(vp1, vp2, vp3)
-						for (var k = 0; k < newVertLine.segments.length; k++){
-							newVertLine.segments[k].handleOut = new Point((Math.random()*xscalerFunc/2)-(xscalerFunc/4), yscalerFunc/4)
-							newVertLine.segments[k].handleIn = new Point((Math.random()*xscalerFunc/2)-(xscalerFunc/4), -yscalerFunc/4)
-						}
-					}else{ //If we're at the right side of the puzzle, we just want flat edges here.
-						var vp1 = new Point((upperLeftCorner.x + xscalerFunc * (i+1)), (upperLeftCorner.y + yscalerFunc * (j)))
-						var vp3 = new Point((upperLeftCorner.x + xscalerFunc * (i+1)), (upperLeftCorner.y + yscalerFunc * (j+1)))
-						newVertLine.add(vp1, vp3)
-					}
-					
-					var newHorizLine = new Path() //The horizontal puzzle edge...
-					newHorizLine.strokeColor = 'black' //Again, if you want to see the edges...
-					if(j < yPiecesFunc - 1){
-						var hp1 = new Point((upperLeftCorner.x + xscalerFunc * (i)), (upperLeftCorner.y + yscalerFunc * (j+1)))
-						var hp2 = new Point((upperLeftCorner.x + (xscalerFunc * (i + 0.5))+(Math.random()*xscalerFunc/4 - xscalerFunc/8)), upperLeftCorner.y + (yscalerFunc * (j+1))+(Math.random()*yscalerFunc/4 - yscalerFunc / 8))
-						var hp3 = new Point((upperLeftCorner.x + xscalerFunc * (i+1)), (upperLeftCorner.y + yscalerFunc * (j+1)))
-						newHorizLine.add(hp1, hp2, hp3)
-						for (var k = 0; k < newHorizLine.segments.length; k++){
-							newHorizLine.segments[k].handleOut = new Point(xscalerFunc/4, (Math.random()*yscalerFunc/2)-(yscalerFunc/4))
-							newHorizLine.segments[k].handleIn = new Point(-xscalerFunc/4, (Math.random()*yscalerFunc/2)-(yscalerFunc/4))
-						}//I really hope I didn't bork any of that up. 
-					}else{
-						var hp1 = new Point((upperLeftCorner.x + xscalerFunc * (i)), (upperLeftCorner.y + yscalerFunc * (j+1)))
-						var hp3 = new Point((upperLeftCorner.x + xscalerFunc * (i+1)), (upperLeftCorner.y + yscalerFunc * (j+1)))
-						newHorizLine.add(hp1, hp3)
-					}
-					
-					var pieceMask = new Path() //FINGERS CROSSED
-					pieceMask.join(prevHorizLine)
-					pieceMask.join(newVertLine)
-					pieceMask.join(newHorizLine)
-					pieceMask.join(prevVertLineArray[j])
-					pieceMask.closed = true;
+					var pieceMask = new Path.Rectangle(new Point(upperLeftCorner.x + (i * xscalerFunc), upperLeftCorner.y + (j * yscalerFunc)), new Point(upperLeftCorner.x + ((i + 1) * xscalerFunc), upperLeftCorner.y + ((j + 1)* yscalerFunc))) //Gonna add in more complicated geometry later.
 					var pieceOutline = pieceMask.clone() //That SHOULD work?
-					var pieceFill = ras.clone() //Each piece will have its owncopy of the main picture, and damn the inefficiency.
+					var pieceFill = ras.clone() //Each piece will have its own copy of the main picture, and damn the inefficiency.
 					pieceMask.fillColor = new Color(1,1,1) //Fill the 'shape' so that it'll overlap properly, i hope.
 					pieceOutline.strokeColor = 'black'
 					pieceOutline.strokeWidth = 5 //And make a nice thick outline for the pieces.
@@ -140,12 +102,15 @@
 					gid++
 					moveAll(puzpiece, new Point(Math.random()*500 - 250, Math.random()*300-150))
 					puzzlePieces.push(puzpiece)
-					console.log("Check piece geometry:")
-					prevHorizLine = newHorizLine.clone()
-					prevVertLineArray[j] = newVertLine.clone()
 				}
 			}
-			
+			/*for(var i = 0; i < xPiecesFunc; i++){ //Well, THIS doesn't work.
+				for(var j = 0; j < yPiecesFunc; j++){
+					puzzlePieces[i][j].onMouseDrag = function(event){
+						puzzlePieces[i][j].position += event.delta
+					}
+				}
+			}*/
 		}
 		
 		ras = new Raster({
@@ -178,7 +143,7 @@
 		
 		var movingPiece //gotta have this on hand to modify
 		var mousePreviousLoc = new Point(0,0) //default values, YEAH
-		//var pieceCoords = 0 //Now that we're throwing each selected piece into the top of the aray, we don't need to remember this anymore.
+		var pieceCoords = 0
 		var pieceStartLoc = new Point(0,0)
 		var isDragging = false //boolean to keep a crap ton of error messages from appearing.
 		function downBehavior(mevent){
@@ -186,15 +151,10 @@
 			for(var i = 0; i < puzzlePieces.length; i++){ //navigate through the puzzle piece array...
 				for(var j = 0; j < puzzlePieces[i].groups.length; j++){
 					if(puzzlePieces[i].groups[j].firstChild.contains(new Point(mevent.pageX, mevent.pageY))){ //This will only trigger when the outline of the puzzle piece contains the point.
-						movingPiece = puzzlePieces[i] //SAVED for future abuse. And list relocation.
-						puzzlePieces.splice(i,1) //REMOVED from the list.
-						for(var k = 0; k < movingPiece.groups.length; k++){
-							movingPiece.groups[k].bringToFront() //Take all them things in our selected piece and move their asses up front.
-						}
-						puzzlePieces.unshift(movingPiece)
+						movingPiece = puzzlePieces[i] //SAVED for future abuse.
 						pieceStartLoc = movingPiece.picPoint //Remember where we started...
 						mousePreviousLoc = new Point(mevent.pageX, mevent.pageY) //and where the mouse was originally.
-						//pieceCoords = i
+						pieceCoords = i
 						i = puzzlePieces.length - 1 //now ABORT!
 						j = puzzlePieces[i].groups.length - 1 //ABORT I SAY!
 						isDragging = true //Drag mode: ON!
@@ -211,7 +171,7 @@
 				moveAll(movingPiece, (mouseNewLoc - mousePreviousLoc)) //MATH for moving!
 				mousePreviousLoc = mouseNewLoc
 				//console.log(movingPiece.picPoint)
-				puzzlePieces[0] = movingPiece //And throw that back in there just in case that's how it works. I honestly have no idea but better safe than sorry.
+				puzzlePieces[pieceCoords] = movingPiece //And throw that back in there just in case that's how it works. I honestly have no idea but better safe than sorry.
 			}
 		}
 		stage.addEventListener("mousemove",moveBehavior)
@@ -221,7 +181,7 @@
 				
 				movingPiece = new Item() //RESET so we don't screw with the wrong piece!
 				mousePreviousLoc = new Point(0,0)
-				//pieceCoords = new Point(0,0)
+				pieceCoords = new Point(0,0)
 				pieceStartLoc = new Point(0,0)
 				isDragging = false //Drag mode: OFF!
 				checkSnaps(puzzlePieces)
@@ -254,7 +214,6 @@
 									if(Math.abs(piece1.jpos[i1] - piece2.jpos[i2]) == 1){
 										console.log("SNAP triggered at " + i + ", " + j + "!")
 										snap(puzarray, piece1, piece2)
-										//break breaktastic // this enforces a One Snap Per Mouseclick logic. We'll see how well that does.
 									}
 								}
 								if(Math.abs(piece1.ipos[i1] - piece2.ipos[i2]) == 1){
@@ -263,7 +222,6 @@
 									if(piece1.jpos[i1] == piece2.jpos[i2]){
 										console.log("SNAP triggered at " + i + ", " + j + "!")
 										snap(puzarray, piece1, piece2)
-										//break breaktastic
 									}
 								}
 							}
@@ -273,24 +231,22 @@
 			}
 		}
 		
-		function snap(puzarray, puz1, newHorizLine){
+		function snap(puzarray, puz1, puz2){
 			var targ
-			if(puz1.gid < newHorizLine.gid){
-				moveAll(puz1, (newHorizLine.picPoint - puz1.picPoint))	
-				var numPops = newHorizLine.groups.length //gotta save this or else the Popping decreases the length of the array and we get pieces left abandoned by their groups.
-				for(var i = 0; i < numPops; i++){
-					puz1.groups.push(newHorizLine.groups.pop())
-					puz1.ipos.push(newHorizLine.ipos.pop())
-					puz1.jpos.push(newHorizLine.jpos.pop())
+			if(puz1.gid < puz2.gid){
+				moveAll(puz1, (puz2.picPoint - puz1.picPoint))	
+				for(var i = 0; i < puz2.groups.length; i++){
+					puz1.groups.push(puz2.groups.pop())
+					puz1.ipos.push(puz2.ipos.pop())
+					puz1.jpos.push(puz2.jpos.pop())
 				}
-				targ = puzarray.indexOf(newHorizLine)
+				targ = puzarray.indexOf(puz2)
 			}else{
-				moveAll(newHorizLine, (puz1.picPoint - newHorizLine.picPoint))
-				var numPops = puz1.groups.length
-				for(var i = 0; i < numPops; i++){
-					newHorizLine.groups.push(puz1.groups.pop())
-					newHorizLine.ipos.push(puz1.ipos.pop())
-					newHorizLine.jpos.push(puz1.jpos.pop())
+				moveAll(puz2, (puz1.picPoint - puz2.picPoint))
+				for(var i = 0; i < puz1.groups.length; i++){
+					puz2.groups.push(puz1.groups.pop())
+					puz2.ipos.push(puz1.ipos.pop())
+					puz2.jpos.push(puz1.jpos.pop())
 				}
 				targ = puzarray.indexOf(puz1)
 			}
@@ -301,6 +257,75 @@
     </script>
 </head>
 <body>
+<form name="myForm" onsubmit="return puzSetup()">
+		<table>
+			<tr>
+				<td>Pick a pic!
+					<input type="file" id="puzzlimg" onchange="addNewPic(); updateSettings()">
+					<img src="" height="200" alt="Image preview...">
+				</td>
+				<td>
+					<input type="radio" name="ptype" value="ps">Choose a preset size!
+					<input type="radio" name="ptype" value="cs">Make your own dimensions!
+					<input type="button" onclick="chooseTypeValues(); updateSettings()" value="CLICK!">
+				</td>
+			</tr>
+			<tr id="pset">
+				<td>Choose the number of Rows x Columns you want your puzzle to have!
+					<input list="presets" name="presets" onchange="updateSettings()">
+					<datalist id="presets">
+						<option value="2x2">
+						<option value="4x6">
+						<option value="5x5">
+						<option value="6x4">
+						<option value="8x12">
+						<option value="10x10">
+						<option value="12x8">
+						<option value="16x20">
+						<option value="20x16">
+						<option value="20x20">
+					</datalist>
+				</td>
+				<td>Choose an image size (the values listed refer to the longer side of the image)!
+					<select name="presetimgsize" id="presetimgsize" onchange="updateSettings()">
+						<option value="orgsz">Original Size
+						<option value="200">200
+						<option value="300">300
+						<option value="400">400
+						<option value="500">500
+						<option value="600">600
+						<option value="700">700
+						<option value="800">800
+						<option value="900">900
+						<option value="1000">1000
+						<option value="1100">1100
+						<option value="1200">1200
+						<option value="1300">1300
+						<option value="1400">1400
+						<option value="1500">1500
+						<option value="1600">1600
+					</select>
+				</td>
+			</tr>
+			<tr id="cstm">
+				<td>Number of rows: 
+    				<input type="number" name="rows" id="rows" min="1" max="50" onchange="updateSettings()"></input>
+				</td>
+				<td>Number of columns: 
+    				<input type="number" name="columns" id="columns" min="1" max="50" onchange="updateSettings()"></input>
+				</td>
+				<td>Puzzle width: 
+    				<input type="number" name="width" id="width" min="50" max="2000" onchange="updateSettings()"></input>
+				</td>
+				<td>Puzzle height: 
+					<input type="number" name="height" id="height" min="50" max="2000" onchange="updateSettings()"></input>
+				</td>
+			</tr>
+			<tr>
+				<td id="viewVars"></td>
+			</tr>
+		</table>
+	</form>
     <canvas id="canvas" resize></canvas>
 </body>
 </html>
