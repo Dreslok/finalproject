@@ -21,17 +21,16 @@ function updateSettings(){
         columns = frack.columns;
         width = frack.width;
         height = frack.height;
-
     }
     else{
-        thepuzimg.src = JPizzle.jpg;
-        rows = 5;
-        columns = 5;
+        thepuzimg.src = 'JPizzle.jpg';
+        rows = 6;
+        columns = 4;
         width = 420;
         height = 666;
     }
     document.getElementById("viewVars").innerHTML = "" + rows + "   " + columns + "    " + width + "   " + height + "";
-
+    return {rows: rows, columns: columns, width: width, height: height};
 }
 
 
@@ -144,18 +143,4 @@ function chooseCustom(){
 
 
 
-function addNewPic(){
-    var preview = document.querySelector('img'); //selects the query named img
-       var file    = document.querySelector('input[type=file]').files[0]; //sames as here
-       var reader  = new FileReader();
 
-       reader.onloadend = function () {
-           preview.src = reader.result;
-       }
-
-       if (file) {
-           reader.readAsDataURL(file); //reads the data as a URL
-       } else {
-           preview.src = "";
-       }
-}
