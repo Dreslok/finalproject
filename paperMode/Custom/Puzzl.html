@@ -39,6 +39,8 @@
     <script type="text/paperscript" canvas="canvas">
     <!--<script type="text/javascript" canvas="canvas">-->
 	document.getElementById("mybutton").onclick = function(){
+		project.activeLayer.removeChildren();
+
 		/*
 		var xscalerFunc = 100
 		var puz = new Path() //The puzzle edge
@@ -90,9 +92,12 @@
 
 		function puzzleBuilder(xscalerFunc, yscalerFunc, xPiecesFunc, yPiecesFunc){
 			var upperLeftCorner = new Point(view.center.x - (ras.width / 2), view.center.y - (ras.height / 2)) //The raster appears in center stage. So we need the puzzle pieces to adapt to that.
-			for(var i = 0; i < puzzlePieces.length; i++){
+			// for(var i = 0; i < puzzlePieces.length; i++){
+			for(var i = (puzzlePieces.length - 1); i >= 0; i--){
+
 				puzzlePieces[i].remove() //Clearing out all existing objects inside it, just in case.
 			}
+			console.log(puzzlePieces)
 			puzzlePieces = []
 			var gid = 0
 			var prevHorizLine = new Path() //We need a variable to hold the previously generated horizontal line, and one for the previously generated vertical line, so that pieces mesh.
@@ -179,9 +184,8 @@
 			
 		}//puzzleBuilder
 
-		
+		ras = null;
 		ras = new Raster({
-			// source: puzimg,
 			source: document.getElementById("preview").src,
 			width: xSize,
 			height: ySize,
@@ -354,7 +358,7 @@
 		<table>
 			<tr>
 				<td colspan="4">Pick a pic!
-					<input type="file" id="puzzlimg">
+					<input type="file" id="puzzlimg" onchange="addNewPic()">
 					<img id="preview" alt="img gose here" height="200px"></img>
 				</td>
 			</tr>
