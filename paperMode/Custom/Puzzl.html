@@ -13,26 +13,17 @@
 			border-width: 1px;
 			border-color: black;
 			border-style: solid;
-			max-width: 1em;
-			max-height: 1em;
-			visibility: collapse;
 		}
 		tr {
 			border-width: 1px;
 			border-color: black;
 			border-style: solid;
-			max-width: 1em;
-			max-height: 1em;
-			visibility: collapse;
 		}
 		table {
 			border-width: 1px;
 			border-color: darkslateblue;
 			border-style: solid;
 			float: right;
-			max-width: 1em;
-			max-height: 1em;
-			visibility: collapse;
 		}
 		#pset {
 			visibility: collapse;
@@ -44,9 +35,10 @@
     <script type="text/javascript" src="../dist/paper-full.js"></script>
 	<script type="text/javascript" src="piececlass.js"></script>
 	<script type="text/javascript" src="setup.js"></script>	
+
     <script type="text/paperscript" canvas="canvas">
     <!--<script type="text/javascript" canvas="canvas">-->
-		
+	document.getElementById("mybutton").onclick = function(){
 		/*
 		var xscalerFunc = 100
 		var puz = new Path() //The puzzle edge
@@ -82,19 +74,20 @@
 			groupy.position += event.delta
 		}
 		 */ //group and puzzle geometry testing. Now for creating an actual grid!
-		
+
+		// var getValues = {image: 'JPizzle.jpg', rows: 5, columns: 3, width: 420, height: 666}
+
 		var getValues = updateSettings()
-		//var xPieces = 5
-		var xPieces = getValues.rows
-		//var yPieces = 3
-		var yPieces = getValues.columns
+		var puzimg = getValues.image
+		var xPieces = getValues.columns
+		var yPieces = getValues.rows
 		var xSize = getValues.width
 		var ySize = getValues.height
 		var xscaler 
 		var yscaler
 		var puzzlePieces = []
 		var ras
-		
+
 		function puzzleBuilder(xscalerFunc, yscalerFunc, xPiecesFunc, yPiecesFunc){
 			var upperLeftCorner = new Point(view.center.x - (ras.width / 2), view.center.y - (ras.height / 2)) //The raster appears in center stage. So we need the puzzle pieces to adapt to that.
 			for(var i = 0; i < puzzlePieces.length; i++){
@@ -184,15 +177,25 @@
 				}
 			}
 			
-		}
+		}//puzzleBuilder
+
+		
 		ras = new Raster({
-			source: 'JPizzle.jpg',
+			// source: puzimg,
+			source: document.getElementById("preview").src,
 			width: xSize,
 			height: ySize,
-			// source: document.querySelector('input[type=file]').files[0],
 			position: view.center
 		});
+		
+
 		ras.onLoad = function(){
+			for (var i = 0; i < puzzlePieces.length; i++){
+				for(var j = 0; j < puzzlePieces.groups.length; j++){
+					puzzlePieces[i].groups[j].remove()
+				}
+			}
+			puzzlePieces = []
 			// xscaler = ras.width / xPieces
 			// yscaler = ras.height / yPieces
 			xscaler = xSize / xPieces
@@ -340,7 +343,9 @@
 			
 		}
 		
+		}
     </script>
+
 </head>
 <body>
 	<canvas id="canvas" resize></canvas>
@@ -349,19 +354,20 @@
 		<table>
 			<tr>
 				<td colspan="4">Pick a pic!
-					<input type="file" id="puzzlimg" onchange="updateSettings()">
+					<input type="file" id="puzzlimg">
+					<img id="preview" alt="img gose here" height="200px"></img>
 				</td>
 			</tr>
 			<tr>
 				<td colspan="4">
 					<input type="radio" name="ptype" value="ps">Choose a preset size!
 					<input type="radio" name="ptype" value="cs">Make your own dimensions!
-					<input type="button" onclick="chooseTypeValues(); updateSettings()" value="CLICK!">
+					<input type="button" onclick="chooseTypeValues();" value="CLICK!">
 				</td>
 			</tr>
 			<tr id="pset">
 				<td>Choose the number of Rows x Columns you want your puzzle to have!
-					<input list="presets" name="presets" onchange="updateSettings()">
+					<input list="presets" name="presets">
 					<datalist id="presets">
 						<option value="2x2">
 						<option value="4x6">
@@ -376,7 +382,7 @@
 					</datalist>
 				</td>
 				<td>Choose an image size (the values listed refer to the longer side of the image)!
-					<select name="presetimgsize" id="presetimgsize" onchange="updateSettings()">
+					<select name="presetimgsize" id="presetimgsize">
 						<option value="orgsz">Original Size
 						<option value="200">200
 						<option value="300">300
@@ -398,19 +404,20 @@
 			</tr>
 			<tr id="cstm">
 				<td>Number of rows: 
-    				<input type="number" name="rows" id="rows" min="1" max="50" onchange="updateSettings()"></input>
+    				<input type="number" name="rows" id="rows" min="1" max="50"></input>
 				</td>
 				<td>Number of columns: 
-    				<input type="number" name="columns" id="columns" min="1" max="50" onchange="updateSettings()"></input>
+    				<input type="number" name="columns" id="columns" min="1" max="50"></input>
 				</td>
 				<td>Puzzle width: 
-    				<input type="number" name="width" id="width" min="50" max="2000" onchange="updateSettings()"></input>
+    				<input type="number" name="width" id="width" min="50" max="2000"></input>
 				</td>
 				<td>Puzzle height: 
-					<input type="number" name="height" id="height" min="50" max="2000" onchange="updateSettings()"></input>
+					<input type="number" name="height" id="height" min="50" max="2000"></input>
 				</td>
 			</tr>
 			<tr>
+				<td><input type="button" id="mybutton" name="submitVars" value="Make My Puzzle!" onclick="updateSettings();"></td>
 				<td id="viewVars"></td>
 			</tr>
 		</table>

@@ -24,13 +24,15 @@ function updateSettings(){
     }
     else{
         thepuzimg.src = 'JPizzle.jpg';
-        rows = 6;
-        columns = 4;
+        rows = 8;
+        columns = 6;
         width = 420;
         height = 666;
     }
-    document.getElementById("viewVars").innerHTML = "" + rows + "   " + columns + "    " + width + "   " + height + "";
-    return {rows: rows, columns: columns, width: width, height: height};
+    document.getElementById("viewVars").innerHTML = "Rows: " + rows + " Columns: " + columns + " Width: " + width + " Height: " + height + "";
+    console.log(thepuzimg);
+    console.log(thepuzimg.src);
+    return {image: thepuzimg.src, rows: rows, columns: columns, width: width, height: height};
 }
 
 
@@ -144,3 +146,18 @@ function chooseCustom(){
 
 
 
+function addNewPic(){
+    var preview = document.querySelector('img'); //selects the query named img
+       var file    = document.querySelector('input[type=file]').files[0]; //sames as here
+       var reader  = new FileReader();
+
+       reader.onloadend = function () {
+           preview.src = reader.result;
+       }
+
+       if (file) {
+           reader.readAsDataURL(file); //reads the data as a URL
+       } else {
+           preview.src = "";
+       }
+}
