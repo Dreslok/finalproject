@@ -10,9 +10,9 @@ function updateSettings(){
         var RsandCs = sendPresetVals();
         rows = RsandCs.rows;
         columns = RsandCs.columns;
-        var imgsize = myForm.presetimgsize.value;
-        width = imgsize;
-        height = imgsize;
+        var imgsize = calcSize(myForm.presetimgsize.value);
+        width = imgsize.width;
+        height = imgsize.height;
     }
     else if (isCustom()){
         thepuzimg.src = document.querySelector('input[type=file]').files[0];
@@ -35,6 +35,35 @@ function updateSettings(){
     return {image: thepuzimg.src, rows: rows, columns: columns, width: width, height: height};
 }
 
+function calcSize(imgsize){
+    var imgsrc = document.getElementById("preview");
+    var imgwidth = imgsrc.width;
+    var imgheight = imgsrc.height;
+    var newwidth;
+    var newheight;
+    if (imgsize == "orgsz"){
+        newwidth = imgwidth;
+        newheight = imgheight;
+    }
+    else if (imgsize == "hlfsz"){
+        newwidth = imgwidth/2;
+        newheight = imgheight/2;
+    }
+    else{
+    // console.log('imgwidth: '+ imgwidth + 'imgheight: ' + imgheight);
+        if (imgwidth >= imgheight){
+            newwidth = imgsize;
+            newheight = ((imgheight/imgwidth)*imgsize);
+        }
+
+        else{
+            newheight = imgsize;
+            newwidth = ((imgwidth/imgheight)*imgsize);
+        }
+    }
+    // console.log("newwidth: " + newwidth + "newheight: " + newheight);
+    return{width: newwidth, height: newheight};
+}
 
 function sendPresetVals(){
     var pv1 = myForm.presets.value;
@@ -150,7 +179,7 @@ function addNewPic(){
     var preview = document.querySelector('img'); //selects the query named img
        var file    = document.querySelector('input[type=file]').files[0]; //sames as here
        var reader  = new FileReader();
-
+       
        reader.onloadend = function () {
            preview.src = reader.result;
        }

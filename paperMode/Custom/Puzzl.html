@@ -31,6 +31,9 @@
 		#cstm {
 			visibility: collapse;
 		}
+		#preview {
+			visibility: collapse;
+		}
 	</style>
     <script type="text/javascript" src="../dist/paper-full.js"></script>
 	<script type="text/javascript" src="piececlass.js"></script>
@@ -359,7 +362,6 @@
 			<tr>
 				<td colspan="4">Pick a pic!
 					<input type="file" id="puzzlimg" onchange="addNewPic()">
-					<img id="preview" alt="img gose here" height="200px"></img>
 				</td>
 			</tr>
 			<tr>
@@ -388,20 +390,11 @@
 				<td>Choose an image size (the values listed refer to the longer side of the image)!
 					<select name="presetimgsize" id="presetimgsize">
 						<option value="orgsz">Original Size
+						<option value="hlfsz">Half width and half height
 						<option value="200">200
-						<option value="300">300
 						<option value="400">400
-						<option value="500">500
-						<option value="600">600
-						<option value="700">700
 						<option value="800">800
-						<option value="900">900
-						<option value="1000">1000
-						<option value="1100">1100
 						<option value="1200">1200
-						<option value="1300">1300
-						<option value="1400">1400
-						<option value="1500">1500
 						<option value="1600">1600
 					</select>
 				</td>
@@ -426,5 +419,7 @@
 			</tr>
 		</table>
 	</form>
+	<img id="preview" alt="img gose here"></img>
+
 </body>
 </html>
