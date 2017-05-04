@@ -41,6 +41,7 @@ function calcSize(imgsize){
     var imgheight = imgsrc.height;
     var newwidth;
     var newheight;
+
     if (imgsize == "orgsz"){
         newwidth = imgwidth;
         newheight = imgheight;
@@ -50,7 +51,6 @@ function calcSize(imgsize){
         newheight = imgheight/2;
     }
     else{
-    // console.log('imgwidth: '+ imgwidth + 'imgheight: ' + imgheight);
         if (imgwidth >= imgheight){
             newwidth = imgsize;
             newheight = ((imgheight/imgwidth)*imgsize);
@@ -61,7 +61,8 @@ function calcSize(imgsize){
             newwidth = ((imgwidth/imgheight)*imgsize);
         }
     }
-    // console.log("newwidth: " + newwidth + "newheight: " + newheight);
+    console.log('imgwidth: '+ imgwidth + 'imgheight: ' + imgheight);
+    console.log("newwidth: " + newwidth + "newheight: " + newheight);
     return{width: newwidth, height: newheight};
 }
 
