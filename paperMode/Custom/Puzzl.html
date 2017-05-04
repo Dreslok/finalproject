@@ -347,9 +347,20 @@
 				targ = puzarray.indexOf(puz1)
 			}
 			puzarray.splice(targ, 1)
-			
+			if(puzarray.length == 1){
+				victoryThang()
+			}
 		}
-		
+		function victoryThang(){
+			var text = new PointText({
+				point: [50, 200],
+				content: 'YOU WIN!!!!!!!!!!!!!',
+				fillColor: 'pink',
+				fontFamily: 'Courier New',
+				fontWeight: 'bold',
+				fontSize: 100
+			});
+		}
 		}
     </script>
 
