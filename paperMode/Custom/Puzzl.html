@@ -178,6 +178,12 @@
 					var puzpiece = makePiece(pieceGroup, upperLeftCorner, gid, i, j)
 					gid++
 					moveAll(puzpiece, new Point(Math.random()*500 - 250, Math.random()*300-150))
+					if(puzpiece.groups[0].position.x < 0 || puzpiece.groups[0].position.x > stageWidth){
+						moveAll(puzpiece, new Point((stageWidth/2 - puzpiece.groups[0].x)/2,0))
+					}
+					if(puzpiece.groups[0].position.y < 0 || puzpiece.groups[0].position.y > stageHeight){
+						moveAll(puzpiece, new Point(0,(stageHeight/2 - puzpiece.groups[0].y)/2))
+					}
 					puzzlePieces.push(puzpiece)
 					console.log("Check piece geometry:")
 					prevHorizLine = newHorizLine.clone()
