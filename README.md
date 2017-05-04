@@ -1,14 +1,15 @@
-#The Great Paper.js Puzzlr
-
-Puzzlr is a browser-based puzzle game!
-
-Its built on Paper.js and HTML5 Canvas.
-
-#Supported Browsers
+# The Great Paper.js Puzzlr
 
 
+Puzzlr is a browser-based puzzle game by @Jay-Peterson @drijks and @lmgllc
 
-#How To Play
+Its built on [Paper.js](http://paperjs.org/about/) and [HTML5 Canvas](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API).
+
+## Supported Browsers
+
+
+
+## How To Play
 
 1. Clone Git or download ZIP file and unpack.
 2. Open Select.html in a supported web browser.
